@@ -87,4 +87,9 @@ public class TestFeatureManager implements FeatureManager {
         return this;
     }
 
+    @Override
+    public String getId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

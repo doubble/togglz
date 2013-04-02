@@ -127,6 +127,7 @@
     <module>testing</module>
     <module>junit</module>
     <module>distribution</module>
+    <module>jmx</module>
   </modules>
 
   <developers>

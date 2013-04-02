@@ -100,4 +100,9 @@ public class DefaultFeatureManager implements FeatureManager {
         return userProvider.getCurrentUser();
     }
 
+    @Override
+    public String getId() {
+        return this.getClass().getSimpleName() + this.hashCode();
+    }
+
 }

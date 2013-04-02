@@ -49,4 +49,9 @@ public class FallbackTestFeatureManager implements FeatureManager {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public String getId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

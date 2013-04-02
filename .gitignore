@@ -8,4 +8,3 @@ generated-sources/
 *.iml
 *.ipr
 test-output
-/jmx/nb-configuration.xml

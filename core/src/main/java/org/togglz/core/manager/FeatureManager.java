@@ -71,6 +71,4 @@ public interface FeatureManager {
      */
     void setFeatureState(FeatureState state);
 
-    public String getId();
-
 }

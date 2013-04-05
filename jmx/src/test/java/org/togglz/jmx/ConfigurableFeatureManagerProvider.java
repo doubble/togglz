@@ -15,32 +15,25 @@
  */
 package org.togglz.jmx;
 
-import java.util.Set;
-import javax.management.MXBean;
+import org.togglz.core.manager.FeatureManager;
+import org.togglz.core.manager.FeatureManagerBuilder;
+import org.togglz.core.spi.FeatureManagerProvider;
 
 /**
  *
  * @author doubble
  */
-@MXBean
-public interface JmxFeatureManager {
+public class ConfigurableFeatureManagerProvider implements FeatureManagerProvider{
 
-    /**
-     *
-     * @return
-     */
-    Set<String> getFeatures();
+    @Override
+    public FeatureManager getFeatureManager() {
+//        new FeatureManagerBuilder(). ConfigurationHolder.getTogglzConfiguration ()
+        return null;
+    }
 
-    /**
-     *
-     * @param featureName
-     * @return
-     */
-    public JmxFeatureState getFetaureState(String featureName);
-
-    /**
-     *
-     * @param newState
-     */
-    void setFetaureState(JmxFeatureState newState);
+    @Override
+    public int priority() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
 }

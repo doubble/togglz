@@ -24,19 +24,22 @@ import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.togglz.core.Feature;
+import org.togglz.core.activation.UsernameActivationStrategy;
+import org.togglz.core.context.FeatureContext;
 import org.togglz.core.manager.FeatureManager;
 import org.togglz.core.manager.FeatureManagerBuilder;
 import org.togglz.core.repository.mem.InMemoryStateRepository;
 import org.togglz.core.user.NoOpUserProvider;
+
 /**
  *
  * @author doubble
  */
 public class JmxTest {
-        private static FeatureManager featureManager;
-	private MBeanServer server;
-	private ObjectName name;
 
+    private static FeatureManager featureManager;
+    private MBeanServer server;
+    private ObjectName name;
 
     /**
      * Feature under test
@@ -50,26 +53,33 @@ public class JmxTest {
         public boolean isActive() {
             return featureManager.isActive(this);
         }
-
     }
-	@Before
-	public void deployMBean() {
-                featureManager = new FeatureManagerBuilder()
-                    .featureEnum(MyFeatures.class)  
-                    .stateRepository(new InMemoryStateRepository())
-                    .userProvider(new NoOpUserProvider())
-                    .build();
-                // TODO check exceptions in declaration of #start
-                new JmxEnablingFeatureManagerListener().start(featureManager);
-                server = ManagementFactory.getPlatformMBeanServer();
-                name = JmxEnablingFeatureManagerListener.generateObjectName(featureManager.getId());
-	}
 
-	@Test
-	public void testJmxOperations() throws Exception {
-            JmxFeatureManager jmxFM = JMX.newMXBeanProxy(server, name, JmxFeatureManager.class);
-            assertThat(jmxFM.getFeatures().size(), is (2));
-        }
+    @Before
+    public void deployMBean() {
+        featureManager = new FeatureManagerBuilder()
+                .featureEnum(MyFeatures.class)
+                .stateRepository(new InMemoryStateRepository())
+                .userProvider(new NoOpUserProvider())
+                .build();
+//        FeatureContext 
+        // TODO check exceptions in declaration of #start
+        new JmxEnablingFeatureManagerListener().start(featureManager);
+        server = ManagementFactory.getPlatformMBeanServer();
+        name = JmxEnablingFeatureManagerListener.generateObjectName(featureManager.getId());
+    }
 
+    @Test
+    public void testGetFeatures() throws Exception {
+        JmxFeatureManager jmxFM = JMX.newMXBeanProxy(server, name, JmxFeatureManager.class);
+        assertThat(jmxFM.getFeatures().size(), is(2));
+    }
+    
+    @Test
+    public void testGetFeatureState() throws Exception {
+        JmxFeatureManager jmxFM = JMX.newMXBeanProxy(server, name, JmxFeatureManager.class);
+        JmxFeatureState deleteUsersState = jmxFM.getFetaureState(MyFeatures.DELETE_USERS.name());
+        assertThat(deleteUsersState.getFeatureName(), is (MyFeatures.DELETE_USERS.name()));
+        assertThat(deleteUsersState.getStrategyId(), is (UsernameActivationStrategy.ID));
+    }
 }
-

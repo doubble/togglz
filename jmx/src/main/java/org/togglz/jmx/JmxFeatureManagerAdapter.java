@@ -27,6 +27,7 @@ import org.togglz.core.util.UntypedFeature;
  * @author doubble
  */
 public class JmxFeatureManagerAdapter implements JmxFeatureManager {
+
     private FeatureManager fm;
 
     /**
@@ -36,19 +37,19 @@ public class JmxFeatureManagerAdapter implements JmxFeatureManager {
     public JmxFeatureManagerAdapter(FeatureManager fm) {
         this.fm = fm;
     }
-    
+
     /**
      *
      * @return
      */
     @Override
-    public Set<String> getFeatures () {
-        Set<String> features = new HashSet<String> ();
+    public Set<String> getFeatures() {
+        Set<String> features = new HashSet<String>();
         for (Feature feature : this.fm.getFeatures()) {
             features.add(feature.name());
         }
         return features;
- 
+
     }
 
     /**
@@ -57,7 +58,7 @@ public class JmxFeatureManagerAdapter implements JmxFeatureManager {
      */
     @Override
     public void setFetaureState(JmxFeatureState newState) {
-        
+
         FeatureState previousState = fm.getFeatureState(new UntypedFeature(newState.getFeatureName()));
         previousState.setEnabled(newState.isEnabled());
         previousState.setStrategyId(newState.getStrategyId());
@@ -65,7 +66,7 @@ public class JmxFeatureManagerAdapter implements JmxFeatureManager {
         previousState.getParameterMap().putAll(newState.getParameters());
         fm.setFeatureState(previousState);
     }
-    
+
     /**
      *
      * @param featureName
@@ -74,6 +75,6 @@ public class JmxFeatureManagerAdapter implements JmxFeatureManager {
     @Override
     public JmxFeatureState getFetaureState(String featureName) {
         FeatureState state = fm.getFeatureState(new UntypedFeature(featureName));
-        return new JmxFeatureState (featureName, state.isEnabled(), state.getStrategyId(), state.getParameterMap());
+        return new JmxFeatureState(featureName, state.isEnabled(), state.getStrategyId(), state.getParameterMap());
     }
 }

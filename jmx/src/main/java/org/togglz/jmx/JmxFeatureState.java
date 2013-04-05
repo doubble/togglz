@@ -25,11 +25,12 @@ import org.togglz.core.repository.FeatureState;
  * @author doubble
  */
 public class JmxFeatureState {
-    private  String featureName;
-    private  boolean enabled;
-    private  String strategyId;
-    private  Map<String, String> parameters;
-    
+
+    private String featureName;
+    private boolean enabled;
+    private String strategyId;
+    private Map<String, String> parameters;
+
     /**
      *
      * @param featureName
@@ -76,7 +77,7 @@ public class JmxFeatureState {
     public void setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
     }
-    
+
     /**
      *
      * @return
@@ -108,6 +109,4 @@ public class JmxFeatureState {
     public Map<String, String> getParameters() {
         return parameters;
     }
-
-    
 }

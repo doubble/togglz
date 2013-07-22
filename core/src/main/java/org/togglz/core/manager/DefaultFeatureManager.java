@@ -25,12 +25,15 @@ import org.togglz.core.util.Validate;
  */
 public class DefaultFeatureManager implements FeatureManager {
 
+    private final String name;
     private final StateRepository stateRepository;
     private final UserProvider userProvider;
     private final List<ActivationStrategy> strategies;
     private final FeatureProvider featureProvider;
 
-    DefaultFeatureManager(FeatureProvider featureProvider, StateRepository stateRepository, UserProvider userProvider) {
+    DefaultFeatureManager(String name, FeatureProvider featureProvider, StateRepository stateRepository,
+        UserProvider userProvider) {
+        this.name = name;
         this.featureProvider = featureProvider;
         this.stateRepository = stateRepository;
         this.userProvider = userProvider;
@@ -38,12 +41,19 @@ public class DefaultFeatureManager implements FeatureManager {
         Validate.notEmpty(strategies, "No ActivationStrategy implementations found");
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public Set<Feature> getFeatures() {
         return Collections.unmodifiableSet(featureProvider.getFeatures());
     }
 
     @Override
     public FeatureMetaData getMetaData(Feature feature) {
+        Validate.notNull(feature, "feature is required");
         FeatureMetaData metadata = featureProvider.getMetaData(feature);
         if (metadata != null) {
             return metadata;
@@ -51,7 +61,10 @@ public class DefaultFeatureManager implements FeatureManager {
         return new EmptyFeatureMetaData(feature);
     }
 
+    @Override
     public boolean isActive(Feature feature) {
+
+        Validate.notNull(feature, "feature is required");
 
         FeatureState state = stateRepository.getFeatureState(feature);
 
@@ -82,7 +95,9 @@ public class DefaultFeatureManager implements FeatureManager {
 
     }
 
+    @Override
     public FeatureState getFeatureState(Feature feature) {
+        Validate.notNull(feature, "feature is required");
         FeatureState state = stateRepository.getFeatureState(feature);
         if (state == null) {
             boolean enabled = getMetaData(feature).isEnabledByDefault();
@@ -91,13 +106,20 @@ public class DefaultFeatureManager implements FeatureManager {
         return state;
     }
 
+    @Override
     public void setFeatureState(FeatureState state) {
+        Validate.notNull(state, "state is required");
         stateRepository.setFeatureState(state);
     }
 
     @Override
     public FeatureUser getCurrentFeatureUser() {
         return userProvider.getCurrentUser();
+    }
+
+    @Override
+    public String toString() {
+        return "DefaultFeatureManager[" + getName() + "]";
     }
 
 }

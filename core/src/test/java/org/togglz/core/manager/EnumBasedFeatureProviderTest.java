@@ -4,8 +4,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.togglz.core.Feature;
+import org.togglz.core.annotation.InfoLink;
 import org.togglz.core.annotation.Label;
-import org.togglz.core.context.FeatureContext;
+import org.togglz.core.annotation.Owner;
 import org.togglz.core.metadata.FeatureMetaData;
 import org.togglz.core.spi.FeatureProvider;
 
@@ -26,7 +27,6 @@ public class EnumBasedFeatureProviderTest {
 
         FeatureProvider provider = new EnumBasedFeatureProvider(ValidFeatureEnum.class);
         assertThat(provider.getFeatures())
-            .hasSize(2)
             .containsSequence(ValidFeatureEnum.FEATURE1, ValidFeatureEnum.FEATURE2);
 
     }
@@ -50,16 +50,72 @@ public class EnumBasedFeatureProviderTest {
 
     }
 
+    @Test
+    public void shouldReturnOwnerNameIfAnnotationPresent() {
+        FeatureProvider provider = new EnumBasedFeatureProvider(ValidFeatureEnum.class);
+        FeatureMetaData metaData = provider.getMetaData(ValidFeatureEnum.WITH_OWNER);
+        assertThat(metaData.getAttributes())
+            .containsValue("Christian");
+    }
+
+    @Test
+    public void shouldReturnNullForOwnerNameByDefault() {
+        FeatureProvider provider = new EnumBasedFeatureProvider(ValidFeatureEnum.class);
+        FeatureMetaData metaData = provider.getMetaData(ValidFeatureEnum.FEATURE1);
+        assertThat(metaData.getAttributes())
+            .doesNotContainValue("Christian");
+    }
+
+    @Test
+    public void shouldReturnInfoLinkIfAnnotationPresent() {
+        FeatureProvider provider = new EnumBasedFeatureProvider(ValidFeatureEnum.class);
+        FeatureMetaData metaData = provider.getMetaData(ValidFeatureEnum.WITH_LINK);
+        assertThat(metaData.getAttributes())
+            .containsValue("https://github.com/togglz/togglz/pull/33");
+    }
+
+    @Test
+    public void shouldReturnNullForInfoLinkByDefault() {
+        FeatureProvider provider = new EnumBasedFeatureProvider(ValidFeatureEnum.class);
+        FeatureMetaData metaData = provider.getMetaData(ValidFeatureEnum.FEATURE1);
+        assertThat(metaData.getAttributes())
+            .doesNotContainValue("https://github.com/togglz/togglz/pull/33");
+    }
+
+    @Test
+    public void shouldReturnCombinedFeatureListForMultipleEnums() {
+
+        FeatureProvider provider = new EnumBasedFeatureProvider()
+            .addFeatureEnum(ValidFeatureEnum.class)
+            .addFeatureEnum(OtherFeatureEnum.class);
+
+        // all feature are in the list
+        assertThat(provider.getFeatures())
+            .hasSize(ValidFeatureEnum.values().length + OtherFeatureEnum.values().length)
+            .contains(ValidFeatureEnum.FEATURE1)
+            .contains(OtherFeatureEnum.ADDITIONAL_FEATURE);
+
+    }
+
+    @Test
+    public void shouldBuildMetadataForMultipleEnums() {
+
+        FeatureProvider provider = new EnumBasedFeatureProvider()
+            .addFeatureEnum(ValidFeatureEnum.class)
+            .addFeatureEnum(OtherFeatureEnum.class);
+
+        assertThat(provider.getMetaData(ValidFeatureEnum.FEATURE1).getLabel())
+            .isEqualTo("First feature");
+        assertThat(provider.getMetaData(OtherFeatureEnum.ADDITIONAL_FEATURE).getLabel())
+            .isEqualTo("Additional Feature");
+
+    }
+
     private static class NotAnEnum implements Feature {
 
         @Override
         public String name() {
             return "something";
-        }
-
-        @Override
-        public boolean isActive() {
-            return false;
         }
 
     }
@@ -69,12 +125,20 @@ public class EnumBasedFeatureProviderTest {
         @Label("First feature")
         FEATURE1,
 
-        FEATURE2;
+        FEATURE2,
 
-        @Override
-        public boolean isActive() {
-            return FeatureContext.getFeatureManager().isActive(this);
-        }
+        @Owner("Christian")
+        WITH_OWNER,
+
+        @InfoLink("https://github.com/togglz/togglz/pull/33")
+        WITH_LINK;
+
+    }
+
+    public static enum OtherFeatureEnum implements Feature {
+
+        @Label("Additional Feature")
+        ADDITIONAL_FEATURE;
 
     }
 
@@ -89,11 +153,6 @@ public class EnumBasedFeatureProviderTest {
         @Override
         public String name() {
             return name;
-        }
-
-        @Override
-        public boolean isActive() {
-            throw new UnsupportedOperationException();
         }
 
     }

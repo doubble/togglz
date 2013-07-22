@@ -1,10 +1,10 @@
 package org.togglz.core.metadata;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import org.togglz.core.Feature;
-import org.togglz.core.group.FeatureGroup;
 
 /**
  * {@link FeatureMetaData} implementation that doesn't provide any information.
@@ -32,6 +32,11 @@ public class EmptyFeatureMetaData implements FeatureMetaData {
     @Override
     public Set<FeatureGroup> getGroups() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        return Collections.emptyMap();
     }
 
 }
